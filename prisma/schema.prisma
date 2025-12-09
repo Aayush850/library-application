@@ -1,0 +1,124 @@
+generator client {
+  provider   = "prisma-client"
+  output     = "../lib/generated/prisma"
+  engineType = "client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Genre {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  Book      Book[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Book {
+  id            Int            @id @default(autoincrement())
+  title         String
+  author        String
+  stock         Int            @default(1)
+  cover         String
+  description   String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  createdBy     User           @relation(references: [id], fields: [userId])
+  userId        String
+  genre         Genre          @relation(references: [id], fields: [genreId])
+  genreId       Int
+  BorrowRecords BorrowRecord[]
+}
+
+model Member {
+  id            Int            @id @default(autoincrement())
+  name          String
+  phone         String
+  address       String
+  membershipId  String         @unique
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  userId        String
+  BorrowRecords BorrowRecord[]
+  createdBy     User           @relation(references: [id], fields: [userId])
+}
+
+model BorrowRecord {
+  id        Int      @id @default(autoincrement())
+  member    Member   @relation(references: [id], fields: [memberId])
+  memberId  Int
+  book      Book     @relation(references: [id], fields: [bookId])
+  bookId    Int
+  dueDate    DateTime
+  returnDate DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  createdBy User     @relation(references: [id], fields: [userId])
+}
+
+model User {
+  id            String         @id
+  name          String
+  email         String
+  emailVerified Boolean        @default(false)
+  image         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @default(now()) @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  Book          Book[]
+  Member        Member[]
+  BorrowRecord  BorrowRecord[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  @@map("verification")
+}
