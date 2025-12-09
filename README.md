@@ -1,6 +1,8 @@
 ## ShelfMaster
 A modern library management platform built with Next.js, TypeScript, Postgres, Prisma & ShadCN
 
+![Dashboard](https://github.com/Aayush850/library-application/blob/main/Dashboard.png?raw=true)
+
 ## Features
 - Authentication using Better Auth (Email/Password & Google OAuth)
 - Dashboard with stats & chart using Recharts
