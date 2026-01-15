@@ -6,7 +6,7 @@ import { cache } from "react";
 export const getCurrentUser = cache(async () => {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) {
-    return redirect("/");
+    return redirect("/sign-in");
   }
   return session.user;
 });
