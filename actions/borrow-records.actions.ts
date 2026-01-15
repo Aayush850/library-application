@@ -52,15 +52,19 @@ export const createBorrowRecord = async (
   }
 };
 
-export const findAllBorrowRecords = async (query?: string, page?: string) => {
+export const findAllBorrowRecords = async (
+  userId: string,
+  query?: string,
+  page?: string
+) => {
+  "use cache";
   const limit = 10;
   const page_number = page ? Number(page) : 1;
   const offset = (page_number - 1) * limit;
   try {
-    const user = await getCurrentUser();
     const records = await prisma.borrowRecord.findMany({
       where: {
-        userId: user.id,
+        userId,
         member: {
           name: {
             contains: query,
@@ -80,7 +84,7 @@ export const findAllBorrowRecords = async (query?: string, page?: string) => {
     });
     const totalBooks = await prisma.borrowRecord.count({
       where: {
-        userId: user.id,
+        userId,
         member: {
           name: {
             contains: query,
@@ -131,9 +135,9 @@ export const markBorrowRecordAsReturned = async (id: string) => {
   }
 };
 
-export const getBorrowStats = async () => {
+export const getBorrowStats = async (userId: string) => {
+  "use cache";
   try {
-    const user = await getCurrentUser();
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
     sevenDaysAgo.setHours(0, 0, 0, 0);
@@ -142,13 +146,13 @@ export const getBorrowStats = async () => {
         DATE("createdAt") as date,
         COUNT(*)::int as total
       FROM "BorrowRecord"
-      WHERE "userId" = ${user.id}
+      WHERE "userId" = ${userId}
         AND "createdAt" >= ${sevenDaysAgo}
       GROUP BY DATE("createdAt")
       ORDER BY date ASC
     `;
     // Convert to the format you need
-    const formattedStats =  stats.map(stat => ({
+    const formattedStats = stats.map((stat) => ({
       date: new Date(stat.date).toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
@@ -156,20 +160,20 @@ export const getBorrowStats = async () => {
       total: Number(stat.total),
     }));
 
-    const last7Days = Array.from({length:7},(_,i)=>{
-      const d = new Date()
-      d.setDate(d.getDate()-(6-i))
-      return d.toLocaleDateString("en-US",{month:"short",day:"numeric"})
-    })
+    const last7Days = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (6 - i));
+      return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    });
 
-    const finalData = last7Days.map((item)=>{
-      const existing = formattedStats.find((data)=>data.date === item)
-      return{
-        date:item,
-        total:existing?existing.total:0
-      }
-    })
-    return finalData
+    const finalData = last7Days.map((item) => {
+      const existing = formattedStats.find((data) => data.date === item);
+      return {
+        date: item,
+        total: existing ? existing.total : 0,
+      };
+    });
+    return finalData;
   } catch (error) {
     console.error(error);
     return [];

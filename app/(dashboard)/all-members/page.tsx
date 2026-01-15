@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import MembersTable from "./MembersTable";
-import {  Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import SearchForm from "@/components/shared/SearchForm";
 import { findAllMembers } from "@/actions/member.actions";
 import { ArrowLeft } from "lucide-react";
 import MyPagination from "@/components/shared/Pagination";
+import { getCurrentAdapter } from "better-auth";
+import { getCurrentUser } from "@/utils/getCurrentUser";
 
 const AllMembersPage = async (props: {
   searchParams?: Promise<{
@@ -14,9 +16,14 @@ const AllMembersPage = async (props: {
   }>;
 }) => {
   const searchParams = await props.searchParams;
+  const user = await getCurrentUser();
   const query = searchParams?.query;
   const page = searchParams?.page;
-  const { members, success, message, totalPages } = await findAllMembers(query, page);
+  const { members, success, message, totalPages } = await findAllMembers(
+    user.id,
+    query,
+    page
+  );
   if (!success || !members) {
     return (
       <>
@@ -53,7 +60,9 @@ const AllMembersPage = async (props: {
           <div>No Members Found.</div>
         )}
       </div>
-    {members.length>=1 && <MyPagination totalPages={totalPages as number}/>}
+      {members.length >= 1 && (
+        <MyPagination totalPages={totalPages as number} />
+      )}
     </main>
   );
 };

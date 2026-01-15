@@ -5,6 +5,7 @@ import BorrowRecordsTable from "./components/BorrowRecordsTable";
 import { findAllBorrowRecords } from "@/actions/borrow-records.actions";
 import SearchForm from "@/components/shared/SearchForm";
 import MyPagination from "@/components/shared/Pagination";
+import { getCurrentUser } from "@/utils/getCurrentUser";
 const BorrowRecords = async (props: {
   searchParams?: Promise<{
     query?: string;
@@ -12,9 +13,14 @@ const BorrowRecords = async (props: {
   }>;
 }) => {
   const searchParams = await props.searchParams;
+  const user = await getCurrentUser();
   const query = searchParams?.query;
   const page = searchParams?.page;
-  const { records, totalPages } = await findAllBorrowRecords(query,page);
+  const { records, totalPages } = await findAllBorrowRecords(
+    user.id,
+    query,
+    page
+  );
   return (
     <main className="space-y-8">
       <header className="flex justify-between">
@@ -29,7 +35,7 @@ const BorrowRecords = async (props: {
           </Button>
         </Link>
       </header>
-       <SearchForm placeholder="Search records by member name..." />
+      <SearchForm placeholder="Search records by member name..." />
       <div>
         {records.length >= 1 ? (
           <BorrowRecordsTable records={records} />
@@ -37,7 +43,7 @@ const BorrowRecords = async (props: {
           <div>No records found.</div>
         )}
       </div>
-     {records.length>=1 && <MyPagination totalPages={totalPages}/>}
+      {records.length >= 1 && <MyPagination totalPages={totalPages} />}
     </main>
   );
 };

@@ -3,6 +3,7 @@ import BookForm from "../shared/BookForm";
 import prisma from "@/db/prisma";
 
 const AddNewBookPage = async () => {
+  "use cache";
   const genres = await prisma.genre.findMany();
   return (
     <div className="space-y-8">
