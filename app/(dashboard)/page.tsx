@@ -12,11 +12,16 @@ import BarChartComponent from "@/components/shared/BarChart";
 import { getDashboardData } from "@/actions/dashboard.actions";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { getCurrentUser } from "@/utils/getCurrentUser";
 
 const HomePage = async () => {
+  const user = await getCurrentUser();
+  const [dashboardStats, borrowStats] = await Promise.all([
+    getDashboardData(user.id),
+    getBorrowStats(user.id),
+  ]);
   const { totalBooks, totalMembers, activeBorrows, overDue, recentMembers } =
-    await getDashboardData();
-  const borrowStats = await getBorrowStats();
+    dashboardStats;
   return (
     <main className="space-y-8">
       <header>

@@ -22,15 +22,19 @@ export const createBook = async (
   }
 };
 
-export const findAllBooks = async (query?: string, page?: string) => {
+export const findAllBooks = async (
+  userId: string,
+  query?: string,
+  page?: string
+) => {
+  "use cache";
   const limit = 10;
   const page_number = page ? Number(page) : 1;
   const offset = (page_number - 1) * limit;
   try {
-    const user = await getCurrentUser();
     const books = await prisma.book.findMany({
       where: {
-        userId: user.id,
+        userId,
         title: {
           contains: query,
           mode: "insensitive",
@@ -44,7 +48,7 @@ export const findAllBooks = async (query?: string, page?: string) => {
     });
     const totalBooks = await prisma.book.count({
       where: {
-        userId: user.id,
+        userId,
         title: {
           contains: query,
           mode: "insensitive",
@@ -127,7 +131,7 @@ export const findAvailableBooks = async (query?: string) => {
           mode: "insensitive",
         },
       },
-      take: 10, 
+      take: 10,
       select: {
         id: true,
         title: true,

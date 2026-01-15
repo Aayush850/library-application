@@ -25,15 +25,18 @@ export const createMember = async (
   }
 };
 
-export const findAllMembers = async (query?: string, page?: string) => {
+export const findAllMembers = async (
+  userId: string,
+  query?: string,
+  page?: string
+) => {
   const limit = 10;
   const page_number = page ? Number(page) : 1;
   const offset = (page_number - 1) * limit;
   try {
-    const currentUser = await getCurrentUser();
     const members = await prisma.member.findMany({
       where: {
-        userId: currentUser.id,
+        userId,
         name: {
           contains: query,
           mode: "insensitive",
@@ -47,7 +50,7 @@ export const findAllMembers = async (query?: string, page?: string) => {
     });
     const totalMembers = await prisma.member.count({
       where: {
-        userId: currentUser.id,
+        userId,
         name: {
           contains: query,
           mode: "insensitive",
@@ -121,4 +124,3 @@ export const deleteMember = async (id: string) => {
     return { success: false, message: errorFormat(error, error.message) };
   }
 };
-

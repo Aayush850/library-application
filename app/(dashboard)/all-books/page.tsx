@@ -6,6 +6,7 @@ import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import SearchForm from "@/components/shared/SearchForm";
 import { findAllBooks } from "@/actions/book.actions";
 import MyPagination from "@/components/shared/Pagination";
+import { getCurrentUser } from "@/utils/getCurrentUser";
 const AllBooksPage = async (props: {
   searchParams?: Promise<{
     query?: string;
@@ -13,9 +14,10 @@ const AllBooksPage = async (props: {
   }>;
 }) => {
   const searchParams = await props.searchParams;
+  const user = await getCurrentUser();
   const query = searchParams?.query;
   const page = searchParams?.page;
-  const { books,totalPages } = await findAllBooks(query,page);
+  const { books, totalPages } = await findAllBooks(user.id, query, page);
   return (
     <main className="space-y-8">
       <header className="flex justify-between">
@@ -31,30 +33,32 @@ const AllBooksPage = async (props: {
         </Link>
       </header>
       <SearchForm placeholder="Search books by title..." />
-      {books.length < 1 ?<div>
-        No books found.
-      </div>: <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-        {books.map((book) => {
-          return (
-            <Link key={book.id} href={`/all-books/${book.id}`}>
-              <Card>
-                <CardContent className="space-y-2">
-                  <Image
-                    src={book.cover}
-                    alt="book-cover"
-                    height={300}
-                    width={200}
-                    className="w-[200px] h-[300px] object-cover mx-auto"
-                  />
-                  <CardTitle>{book.title}</CardTitle>
-                  <p className="text-muted-foreground">{book.author}</p>
-                </CardContent>
-              </Card>
-            </Link>
-          );
-        })}
-      </div>}
-     {books.length>=1 && <MyPagination totalPages={totalPages}/>}
+      {books.length < 1 ? (
+        <div>No books found.</div>
+      ) : (
+        <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+          {books.map((book) => {
+            return (
+              <Link key={book.id} href={`/all-books/${book.id}`}>
+                <Card>
+                  <CardContent className="space-y-2">
+                    <Image
+                      src={book.cover}
+                      alt="book-cover"
+                      height={300}
+                      width={200}
+                      className="w-[200px] h-[300px] object-cover mx-auto"
+                    />
+                    <CardTitle>{book.title}</CardTitle>
+                    <p className="text-muted-foreground">{book.author}</p>
+                  </CardContent>
+                </Card>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+      {books.length >= 1 && <MyPagination totalPages={totalPages} />}
     </main>
   );
 };
