@@ -57,4 +57,5 @@ export async function signInWithCredentials(
 
 export async function signOut() {
   await auth.api.signOut({ headers: await headers() });
+  redirect("/sign-in");
 }
