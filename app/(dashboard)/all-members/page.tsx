@@ -6,7 +6,6 @@ import SearchForm from "@/components/shared/SearchForm";
 import { findAllMembers } from "@/actions/member.actions";
 import { ArrowLeft } from "lucide-react";
 import MyPagination from "@/components/shared/Pagination";
-import { getCurrentAdapter } from "better-auth";
 import { getCurrentUser } from "@/utils/getCurrentUser";
 
 const AllMembersPage = async (props: {

@@ -30,6 +30,7 @@ export const findAllMembers = async (
   query?: string,
   page?: string
 ) => {
+  "use cache";
   const limit = 10;
   const page_number = page ? Number(page) : 1;
   const offset = (page_number - 1) * limit;
