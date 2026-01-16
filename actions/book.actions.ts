@@ -4,6 +4,8 @@ import z from "zod";
 import { createBookSchema } from "@/utils/validators";
 import { getCurrentUser } from "@/utils/getCurrentUser";
 import { errorFormat } from "@/utils/error-handler";
+import { updateTag } from "next/cache";
+import { cacheTag } from "next/cache";
 
 export const createBook = async (
   formData: z.infer<typeof createBookSchema>
@@ -16,6 +18,8 @@ export const createBook = async (
         userId: currentUser.id,
       },
     });
+    updateTag("all-books");
+    updateTag("dashboard-stats");
     return { success: true, message: "Book added succesfully." };
   } catch (error) {
     return { success: false, message: "Could not add the book." };
@@ -28,6 +32,7 @@ export const findAllBooks = async (
   page?: string
 ) => {
   "use cache";
+  cacheTag("all-books");
   const limit = 10;
   const page_number = page ? Number(page) : 1;
   const offset = (page_number - 1) * limit;
@@ -92,6 +97,8 @@ export const deleteBook = async (id: string) => {
         userId: currentUser.id,
       },
     });
+    updateTag("all-books");
+    updateTag("dashboard-stats");
     return { success: true, message: "Book has been deleted successfully" };
   } catch (error: any) {
     return { success: false, message: errorFormat(error, error.message) };
@@ -113,6 +120,7 @@ export const updateBook = async (
         ...formData,
       },
     });
+    updateTag("all-books");
     return { success: true, message: "Book edited succesfully." };
   } catch (error: any) {
     return { success: false, message: errorFormat(error, error.message) };

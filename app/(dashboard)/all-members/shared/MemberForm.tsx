@@ -44,6 +44,7 @@ const MemberForm = ({
       const { success, message } = await createMember(data);
       if (success) {
         toast.success(message);
+        form.reset();
         redirect("/all-members");
       } else {
         toast.error(message);

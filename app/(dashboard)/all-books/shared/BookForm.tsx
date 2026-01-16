@@ -26,7 +26,6 @@ import { toast } from "sonner";
 import { redirect } from "next/navigation";
 import { Book, type Genre } from "@/types";
 
-
 type BookFormProps = {
   genres: Genre[];
   mode: "Edit" | "Create";
@@ -61,15 +60,15 @@ const BookForm: React.FC<BookFormProps> = ({ genres, mode, existingBook }) => {
       const res = await createBook(data);
       if (res.success) {
         toast.success(res.message);
+        form.reset();
         redirect("/all-books");
       } else {
         toast.error(res.message);
       }
-    }
-    else{
-      const bookId = `${existingBook!.id}` 
-      const res = await updateBook(bookId,data);
-       if (res.success) {
+    } else {
+      const bookId = `${existingBook!.id}`;
+      const res = await updateBook(bookId, data);
+      if (res.success) {
         toast.success(res.message);
         redirect("/all-books");
       } else {

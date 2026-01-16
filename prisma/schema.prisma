@@ -38,26 +38,28 @@ model Member {
   name          String
   phone         String
   address       String
-  membershipId  String         @unique
+  membershipId  String
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   userId        String
   BorrowRecords BorrowRecord[]
   createdBy     User           @relation(references: [id], fields: [userId])
+
+  @@unique([membershipId, userId])
 }
 
 model BorrowRecord {
-  id        Int      @id @default(autoincrement())
-  member    Member   @relation(references: [id], fields: [memberId])
-  memberId  Int
-  book      Book     @relation(references: [id], fields: [bookId])
-  bookId    Int
+  id         Int       @id @default(autoincrement())
+  member     Member    @relation(references: [id], fields: [memberId])
+  memberId   Int
+  book       Book      @relation(references: [id], fields: [bookId])
+  bookId     Int
   dueDate    DateTime
   returnDate DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  userId    String
-  createdBy User     @relation(references: [id], fields: [userId])
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  userId     String
+  createdBy  User      @relation(references: [id], fields: [userId])
 }
 
 model User {

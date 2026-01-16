@@ -6,7 +6,7 @@ import { createBorrowRecordSchema } from "@/utils/validators";
 import z from "zod";
 import { getBookById } from "./book.actions";
 import { findMemberById } from "./member.actions";
-import { revalidatePath } from "next/cache";
+import { cacheTag, updateTag } from "next/cache";
 
 export const createBorrowRecord = async (
   formData: z.infer<typeof createBorrowRecordSchema>
@@ -46,6 +46,9 @@ export const createBorrowRecord = async (
       });
       return record;
     });
+    updateTag("borrow-records");
+    updateTag("borrow-stats");
+    updateTag("dashboard-stats");
     return { success: true, message: "Borrow Record has been created." };
   } catch (error: any) {
     return { success: false, message: errorFormat(error, error.message) };
@@ -58,6 +61,7 @@ export const findAllBorrowRecords = async (
   page?: string
 ) => {
   "use cache";
+  cacheTag("borrow-records");
   const limit = 10;
   const page_number = page ? Number(page) : 1;
   const offset = (page_number - 1) * limit;
@@ -128,7 +132,9 @@ export const markBorrowRecordAsReturned = async (id: string) => {
         },
       });
     });
-    revalidatePath("/borrow-records");
+    updateTag("borrow-records");
+    updateTag("borrow-stats");
+    updateTag("dashboard-stats");
     return { success: true, message: "Borrow record marked as returned." };
   } catch (error: any) {
     return { success: false, message: errorFormat(error, error.message) };
@@ -137,6 +143,7 @@ export const markBorrowRecordAsReturned = async (id: string) => {
 
 export const getBorrowStats = async (userId: string) => {
   "use cache";
+  cacheTag("borrow-stats");
   try {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);

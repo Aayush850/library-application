@@ -1,10 +1,9 @@
 "use server";
 import { createMemberSchema } from "@/utils/validators";
-import z, { success } from "zod";
+import z from "zod";
 import prisma from "@/db/prisma";
-import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { getCurrentUser } from "@/utils/getCurrentUser";
-import { revalidatePath } from "next/cache";
+import { cacheTag, updateTag } from "next/cache";
 import { errorFormat } from "@/utils/error-handler";
 
 export const createMember = async (
@@ -18,10 +17,11 @@ export const createMember = async (
         userId: currentUser.id,
       },
     });
+    updateTag("all-members");
+    updateTag("dashboard-stats");
     return { success: true, message: "Member has been created." };
-  } catch (error) {
-    if (isRedirectError(error)) throw error;
-    return { success: false, message: "An error occured " };
+  } catch (error: any) {
+    return { success: false, message: errorFormat(error, error.message) };
   }
 };
 
@@ -31,6 +31,7 @@ export const findAllMembers = async (
   page?: string
 ) => {
   "use cache";
+  cacheTag("all-members");
   const limit = 10;
   const page_number = page ? Number(page) : 1;
   const offset = (page_number - 1) * limit;
@@ -102,6 +103,7 @@ export const updateMember = async (
         ...formData,
       },
     });
+    updateTag("all-members");
     return { success: true, message: "Member edited succesfully." };
   } catch (error: any) {
     return { success: false, message: errorFormat(error, error.message) };
@@ -119,7 +121,8 @@ export const deleteMember = async (id: string) => {
         userId: currentUser.id,
       },
     });
-    revalidatePath("/all-members");
+    updateTag("all-members");
+    updateTag("dashboard-stats");
     return { success: true, message: "Member has been deleted successfully." };
   } catch (error: any) {
     return { success: false, message: errorFormat(error, error.message) };

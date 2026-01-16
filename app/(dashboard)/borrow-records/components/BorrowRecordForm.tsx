@@ -19,10 +19,9 @@ import { toast } from "sonner";
 import { redirect } from "next/navigation";
 import { useTheme } from "next-themes";
 
-const BorrowRecordForm = () => {
+const BorrowRecordForm = ({ userId }: { userId: string }) => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
-
   const form = useForm<z.infer<typeof createBorrowRecordSchema>>({
     resolver: zodResolver(createBorrowRecordSchema),
   });
@@ -49,7 +48,7 @@ const BorrowRecordForm = () => {
   };
 
   const loadMemberOptions = async (inputValue: string) => {
-    const { members } = await findAllMembers(inputValue);
+    const { members } = await findAllMembers(userId, inputValue);
     const options = members.map((member) => {
       return {
         label: member.name,
@@ -59,89 +58,89 @@ const BorrowRecordForm = () => {
     return options;
   };
 
- const selectStyles = {
-  control: (base: any, state: any) => ({
-    ...base,
-    // Apply transparency depending on theme
-    backgroundColor: isDark
-      ? "color-mix(in oklab, var(--input) 30%, transparent)"
-      : "color-mix(in oklab, var(--input))",
-    borderColor: state.isFocused ? "var(--ring)" : "var(--border)",
-    boxShadow: state.isFocused ? "0 0 0 1px var(--ring)" : "none",
-    color: "var(--foreground)",
-    minHeight: "2.5rem",
-    borderRadius: "var(--radius)",
-    "&:hover": {
-      borderColor: "var(--ring)",
-    },
-  }),
-
-  valueContainer: (base: any) => ({
-    ...base,
-    padding: "0 0.5rem",
-  }),
-
-  singleValue: (base: any) => ({
-    ...base,
-    color: "var(--foreground)",
-  }),
-
-  input: (base: any) => ({
-    ...base,
-    color: "var(--foreground)",
-  }),
-
-  placeholder: (base: any) => ({
-    ...base,
-    color:"var(--foregorund)"
-  }),
-
-  menu: (base: any) => ({
-    ...base,
-    backgroundColor: "var(--card)", // fully opaque
-    border: "1px solid var(--border)",
-    borderRadius: "var(--radius)",
-    overflow: "hidden",
-  }),
-
-  menuList: (base: any) => ({
-    ...base,
-    padding: 0,
-    background: "var(--card)", // fully opaque
-  }),
-
-  option: (base: any, state: any) => ({
-    ...base,
-    backgroundColor: state.isFocused ? "var(--accent)" : "transparent",
-    color: state.isFocused ? "var(--accent-foreground)" : "var(--foreground)",
-    cursor: "pointer",
-    "&:active": {
-      backgroundColor: "var(--accent)",
-    },
-  }),
-
-  noOptionsMessage: (base: any) => ({
-    ...base,
-    color: "var(--muted-foreground)",
-  }),
-
-  loadingMessage: (base: any) => ({
-    ...base,
-    color: "var(--muted-foreground)",
-  }),
-
-  dropdownIndicator: (base: any) => ({
-    ...base,
-    color: "var(--muted-foreground)",
-    "&:hover": {
+  const selectStyles = {
+    control: (base: any, state: any) => ({
+      ...base,
+      // Apply transparency depending on theme
+      backgroundColor: isDark
+        ? "color-mix(in oklab, var(--input) 30%, transparent)"
+        : "color-mix(in oklab, var(--input))",
+      borderColor: state.isFocused ? "var(--ring)" : "var(--border)",
+      boxShadow: state.isFocused ? "0 0 0 1px var(--ring)" : "none",
       color: "var(--foreground)",
-    },
-  }),
+      minHeight: "2.5rem",
+      borderRadius: "var(--radius)",
+      "&:hover": {
+        borderColor: "var(--ring)",
+      },
+    }),
 
-  indicatorSeparator: () => ({
-    backgroundColor: "var(--border)",
-  }),
-};
+    valueContainer: (base: any) => ({
+      ...base,
+      padding: "0 0.5rem",
+    }),
+
+    singleValue: (base: any) => ({
+      ...base,
+      color: "var(--foreground)",
+    }),
+
+    input: (base: any) => ({
+      ...base,
+      color: "var(--foreground)",
+    }),
+
+    placeholder: (base: any) => ({
+      ...base,
+      color: "var(--foregorund)",
+    }),
+
+    menu: (base: any) => ({
+      ...base,
+      backgroundColor: "var(--card)", // fully opaque
+      border: "1px solid var(--border)",
+      borderRadius: "var(--radius)",
+      overflow: "hidden",
+    }),
+
+    menuList: (base: any) => ({
+      ...base,
+      padding: 0,
+      background: "var(--card)", // fully opaque
+    }),
+
+    option: (base: any, state: any) => ({
+      ...base,
+      backgroundColor: state.isFocused ? "var(--accent)" : "transparent",
+      color: state.isFocused ? "var(--accent-foreground)" : "var(--foreground)",
+      cursor: "pointer",
+      "&:active": {
+        backgroundColor: "var(--accent)",
+      },
+    }),
+
+    noOptionsMessage: (base: any) => ({
+      ...base,
+      color: "var(--muted-foreground)",
+    }),
+
+    loadingMessage: (base: any) => ({
+      ...base,
+      color: "var(--muted-foreground)",
+    }),
+
+    dropdownIndicator: (base: any) => ({
+      ...base,
+      color: "var(--muted-foreground)",
+      "&:hover": {
+        color: "var(--foreground)",
+      },
+    }),
+
+    indicatorSeparator: () => ({
+      backgroundColor: "var(--border)",
+    }),
+  };
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>

@@ -8,7 +8,6 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import SignUpWithGoogleButton from "@/components/shared/SignUpWithGoogle";
 
-
 function SignInPage() {
   const [data, action] = useActionState(signInWithCredentials, {
     success: false,
@@ -24,8 +23,8 @@ function SignInPage() {
     );
   };
   return (
-   <div className="mt-8">
-    <form action={action}>
+    <div className="mt-8">
+      <form action={action}>
         <div className="space-y-4 px-8">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -38,6 +37,7 @@ function SignInPage() {
           <SubmitButton />
         </div>
       </form>
+
       <div className="px-8 my-4">
         <SignUpWithGoogleButton />
       </div>
@@ -56,9 +56,7 @@ function SignInPage() {
           Sign up
         </Link>
       </div>
-   </div>
-     
-
+    </div>
   );
 }
 
